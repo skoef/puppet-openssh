@@ -17,10 +17,10 @@ class openssh::params {
   ### Application related parameters
 
   $package = $::operatingsystem ? {
-    /(?i:SLES|OpenSuSE)/ => 'openssh',
-    /(?i:OpenBSD)/       => '',
-    /(?i:Solaris)/       => '',
-    default              => 'openssh-server',
+    /(?i:SLES|OpenSuSE)/   => 'openssh',
+    /(?i:OpenBSD|FreeBSD)/ => '',
+    /(?i:Solaris)/         => '',
+    default                => 'openssh-server',
   }
 
   $service = $::operatingsystem ? {
@@ -55,7 +55,7 @@ class openssh::params {
 
   $config_file_mode = $::operatingsystem ? {
     /(?i:SLES|OpenSuSE)/      => '0640',
-    /(?i:OpenBSD)/            => '0644',
+    /(?i:OpenBSD|FreeBSD)/    => '0644',
     /(?i:Debian|Ubuntu|Mint)/ => '0644',
     default                   => '0600',
   }
@@ -65,13 +65,13 @@ class openssh::params {
   }
 
   $config_file_group = $::operatingsystem ? {
-    /(?i:OpenBSD)/ => 'wheel',
-    default        => 'root',
+    /(?i:OpenBSD|FreeBSD)/ => 'wheel',
+    default                => 'root',
   }
 
   $config_file_init = $::operatingsystem ? {
     /(?i:Debian|Ubuntu|Mint)/ => '/etc/default/ssh',
-    /(?i:OpenBSD)/            => '',
+    /(?i:OpenBSD|FreeBSD)/    => '',
     /(?i:Solaris)/            => '',
     default                   => '/etc/sysconfig/sshd',
   }
@@ -91,6 +91,7 @@ class openssh::params {
   $log_file = $::operatingsystem ? {
     /(?i:Debian|Ubuntu|Mint)/ => '/var/log/syslog',
     /(?i:OpenBSD)/            => '/var/log/authlog',
+    /(?i:FreeBSD)/            => '/var/log/auth.log',
     /(?i:Solaris)/            => '/var/adm/authlog',
     default                   => '/var/log/messages',
   }

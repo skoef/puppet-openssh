@@ -1,18 +1,21 @@
 # File managed by Puppet
-#	$OpenBSD: sshd_config,v 1.89 2013/02/06 00:20:42 dtucker Exp $
-
 # This is the sshd server system-wide configuration file.  See
 # sshd_config(5) for more information.
+
+# This sshd was compiled with PATH=/usr/bin:/bin:/usr/sbin:/sbin
 
 # The strategy used for options in the default sshd_config shipped with
 # OpenSSH is to specify options with their default value where
 # possible, but leave them commented.  Uncommented options override the
 # default value.
 
+# Note that some of FreeBSD's defaults differ from OpenBSD's, and
+# FreeBSD has a few additional options.
+
 Port <%= scope.lookupvar('openssh::port') %>
 #AddressFamily any
 ListenAddress <%= scope.function_options_lookup(['ListenAddress','0.0.0.0']) %>
-#ListenAddress ::
+ListenAddress <%= scope.function_options_lookup(['ListenAddress_v6','::']) %>
 
 # The default requires explicit activation of protocol 1
 #Protocol 2
@@ -36,7 +39,7 @@ LogLevel <%= scope.function_options_lookup(['LogLevel','INFO']) %>
 # Authentication:
 
 #LoginGraceTime 2m
-PermitRootLogin <%= scope.function_options_lookup(['PermitRootLogin','yes']) %>
+PermitRootLogin <%= scope.function_options_lookup(['PermitRootLogin','no']) %>
 #StrictModes yes
 #MaxAuthTries 6
 #MaxSessions 10
@@ -45,8 +48,7 @@ PermitRootLogin <%= scope.function_options_lookup(['PermitRootLogin','yes']) %>
 #PubkeyAuthentication yes
 
 # The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
-# but this is overridden so installations will only check .ssh/authorized_keys
-AuthorizedKeysFile	.ssh/authorized_keys
+#AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys2
 
 #AuthorizedPrincipalsFile none
 
@@ -63,11 +65,11 @@ AuthorizedKeysFile	.ssh/authorized_keys
 # Don't read the user's ~/.rhosts and ~/.shosts files
 #IgnoreRhosts yes
 
-# To disable tunneled clear text passwords, change to no here!
-#PasswordAuthentication yes
+# Change to yes to enable built-in password authentication.
+#PasswordAuthentication no
 #PermitEmptyPasswords no
 
-# Change to no to disable s/key passwords
+# Change to no to disable PAM authentication
 #ChallengeResponseAuthentication yes
 
 # Kerberos options
@@ -80,17 +82,28 @@ AuthorizedKeysFile	.ssh/authorized_keys
 #GSSAPIAuthentication no
 #GSSAPICleanupCredentials yes
 
+# Set this to 'no' to disable PAM authentication, account processing,
+# and session processing. If this is enabled, PAM authentication will 
+# be allowed through the ChallengeResponseAuthentication and
+# PasswordAuthentication.  Depending on your PAM configuration,
+# PAM authentication via ChallengeResponseAuthentication may bypass
+# the setting of "PermitRootLogin without-password".
+# If you just want the PAM account and session checks to run without
+# PAM authentication, then enable this but set PasswordAuthentication
+# and ChallengeResponseAuthentication to 'no'.
+UsePAM <%= scope.function_options_lookup(['UsePAM','yes']) %>
+
 #AllowAgentForwarding yes
 #AllowTcpForwarding yes
 #GatewayPorts no
-#X11Forwarding no
+#X11Forwarding yes
 #X11DisplayOffset 10
 #X11UseLocalhost yes
 #PrintMotd yes
 #PrintLastLog yes
 #TCPKeepAlive yes
 #UseLogin no
-UsePrivilegeSeparation sandbox		# Default for new installations.
+#UsePrivilegeSeparation yes
 #PermitUserEnvironment no
 #Compression delayed
 #ClientAliveInterval 0
@@ -100,13 +113,25 @@ UsePrivilegeSeparation sandbox		# Default for new installations.
 #MaxStartups 10:30:100
 #PermitTunnel no
 #ChrootDirectory none
-#VersionAddendum none
+#VersionAddendum FreeBSD-20130515
 
 # no default banner path
 #Banner none
 
 # override default of no subsystems
 Subsystem	sftp	/usr/libexec/sftp-server
+
+# Disable HPN tuning improvements.
+#HPNDisabled no
+
+# Buffer size for HPN to non-HPN connections.
+#HPNBufferSize 2048
+
+# TCP receive socket buffer polling for HPN.  Disable on non autotuning kernels.
+#TcpRcvBufPoll yes
+
+# Allow the use of the NONE cipher.
+#NoneEnabled no
 
 # Example of overriding settings on a per-user basis
 #Match User anoncvs

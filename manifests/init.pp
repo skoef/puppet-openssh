@@ -458,14 +458,13 @@ class openssh (
 
   ### Firewall management, if enabled ( firewall => true )
   if $openssh::bool_firewall == true {
-    firewall { "openssh_${openssh::protocol}_${openssh::port}":
+    firewall::rule { "openssh_${openssh::protocol}_${openssh::port}":
       source      => $openssh::firewall_src,
       destination => $openssh::firewall_dst,
       protocol    => $openssh::protocol,
       port        => $openssh::port,
       action      => 'allow',
       direction   => 'input',
-      tool        => $openssh::firewall_tool,
       enable      => $openssh::manage_firewall,
     }
   }

@@ -119,8 +119,8 @@ class openssh::params {
   $monitor_target = $::ipaddress
   $firewall = false
   $firewall_tool = ''
-  $firewall_src = '0.0.0.0/0'
-  $firewall_dst = $::ipaddress
+  $firewall_src = ['0.0.0.0/0', '::/0']
+  $firewall_dst = [$::ipaddress, $::ipaddress6]
   $puppi = false
   $puppi_helper = 'standard'
   $debug = false
